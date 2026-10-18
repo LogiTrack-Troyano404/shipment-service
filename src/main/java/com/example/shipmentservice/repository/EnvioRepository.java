@@ -12,7 +12,11 @@ import com.example.shipmentservice.model.EstadoEnvio;
 public interface EnvioRepository extends JpaRepository<Envio, UUID>{
 	
 	Optional<Envio> findByCodigoSeguimiento(String codigoSeguimiento);
-	
+
+	Optional<Envio> findById(UUID id);
+
 	List<Envio> findByEstado(EstadoEnvio estado);
-	
+
+
+
 }

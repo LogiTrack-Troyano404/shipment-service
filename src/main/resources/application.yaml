@@ -1,3 +1,33 @@
+server:
+  port: 8080
+
 spring:
   application:
     name: shipment-service
+
+  datasource:
+    # 'db' es el nombre del servicio del contenedor de MySQL en docker-compose
+    url: ${SPRING_DATASOURCE_URL:jdbc:mysql://localhost:3306/shipment_db?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC}
+    username: ${SPRING_DATASOURCE_USERNAME:shipment-service}
+    password: ${SPRING_DATASOURCE_PASSWORD:1234}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    hibernate:
+      # 'none' o 'validate' si usas schema.sql/data.sql manualmente, o 'update' para que Hibernate gestione tablas
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.MySQLDialect
+
+  sql:
+    init:
+      mode: always # Ejecuta schema.sql y data.sql al iniciar la aplicación
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html

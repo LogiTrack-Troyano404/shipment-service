@@ -10,6 +10,7 @@ import lombok.*;
 @Table(name = "envios")
 @Getter
 @Setter
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = false)
@@ -68,5 +69,4 @@ public class Envio extends AuditoriaBase{
 	
 	@OneToMany(mappedBy = "envio", fetch = FetchType.LAZY)
 	private List<HistorialEstado> historialEstados = new ArrayList<>();
-	
 }
