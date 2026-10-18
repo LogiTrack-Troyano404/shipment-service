@@ -1,12 +1,13 @@
 
-CREATE TABLE clientes {
-	id CHAR(36) PRIMARY KEY,
-	nombre VARCHAR(150) NOT NULL,
-	email VARCHAR(100) NOT NULL UNIQUE,
-	telefono VARCHAR(20),
-	fecha_creacion TIMESTAMP NOT NULL,
-	fecha_modificacion TIMESTAMP
-};
+CREATE TABLE clientes
+(
+    id                 CHAR(36) PRIMARY KEY,
+    nombre             VARCHAR(150) NOT NULL,
+    email              VARCHAR(100) NOT NULL UNIQUE,
+    telefono           VARCHAR(20),
+    fecha_creacion     TIMESTAMP    NOT NULL,
+    fecha_modificacion TIMESTAMP
+);
 
 CREATE TABLE repartidores (
     id CHAR(36) PRIMARY KEY,

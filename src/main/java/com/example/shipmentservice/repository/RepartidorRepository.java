@@ -13,4 +13,6 @@ public interface RepartidorRepository extends JpaRepository<Repartidor, UUID>{
 	
 	List<Repartidor> findByEstado(EstadoRepartidor estado);
 
+
+	Optional<Repartidor> findById(UUID uuid);
 }
