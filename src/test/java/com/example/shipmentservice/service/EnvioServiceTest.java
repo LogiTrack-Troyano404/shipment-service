@@ -1,6 +1,8 @@
 package com.example.shipmentservice.service;
 
+import com.example.shipmentservice.Exception.AsignacionDeRepartidor;
 import com.example.shipmentservice.Exception.CancelacionDeEnvio;
+import com.example.shipmentservice.Exception.RepartidorNoEncontrado;
 import com.example.shipmentservice.model.*;
 import com.example.shipmentservice.repository.ClienteRepository;
 import com.example.shipmentservice.repository.EnvioRepository;
@@ -38,6 +40,7 @@ class EnvioServiceTest {
 
     private Envio envio;
     private Cliente cliente;
+    private Repartidor repartidor;
     private UUID envioId;
 
     @BeforeEach
@@ -61,6 +64,12 @@ class EnvioServiceTest {
         envio.setDestino(destino);
         envio.setEstado(EstadoEnvio.PENDIENTE);
         envio.setCliente(cliente);
+
+        repartidor = new Repartidor();
+        repartidor.setId(UUID.randomUUID());
+        repartidor.setNombre("Carlos Gómez");
+        repartidor.setTipoVehiculo("Motocicleta");
+        repartidor.setEstado(EstadoRepartidor.ACTIVO);
     }
 
     @Test
@@ -134,6 +143,57 @@ class EnvioServiceTest {
 
         assertThrows(CancelacionDeEnvio.class, () -> {
             envioService.cancelarEnvio(envioId);
+        });
+
+        verify(envioRepository, never()).save(any(Envio.class));
+    }
+
+    @Test
+    void asignarRepartidorExitoso() {
+        when(envioRepository.findById(envioId)).thenReturn(Optional.of(envio));
+        when(repartidorRepository.findById(repartidor.getId())).thenReturn(Optional.of(repartidor));
+        when(envioRepository.save(any(Envio.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        Envio resultado = envioService.asignarRepartidor(envioId, repartidor.getId());
+
+        assertNotNull(resultado);
+        assertEquals(repartidor, resultado.getRepartidor());
+        verify(envioRepository, times(1)).save(envio);
+    }
+
+    @Test
+    void asignarRepartidorFallaSiEnvioNoEstaPendiente() {
+        envio.setEstado(EstadoEnvio.EN_RUTA);
+        when(envioRepository.findById(envioId)).thenReturn(Optional.of(envio));
+
+        assertThrows(AsignacionDeRepartidor.class, () -> {
+            envioService.asignarRepartidor(envioId, repartidor.getId());
+        });
+
+        verify(repartidorRepository, never()).findById(any(UUID.class));
+        verify(envioRepository, never()).save(any(Envio.class));
+    }
+
+    @Test
+    void asignarRepartidorFallaSiRepartidorNoExiste() {
+        when(envioRepository.findById(envioId)).thenReturn(Optional.of(envio));
+        when(repartidorRepository.findById(repartidor.getId())).thenReturn(Optional.empty());
+
+        assertThrows(RepartidorNoEncontrado.class, () -> {
+            envioService.asignarRepartidor(envioId, repartidor.getId());
+        });
+
+        verify(envioRepository, never()).save(any(Envio.class));
+    }
+
+    @Test
+    void asignarRepartidorFallaSiRepartidorInactivo() {
+        repartidor.setEstado(EstadoRepartidor.INACTIVO);
+        when(envioRepository.findById(envioId)).thenReturn(Optional.of(envio));
+        when(repartidorRepository.findById(repartidor.getId())).thenReturn(Optional.of(repartidor));
+
+        assertThrows(AsignacionDeRepartidor.class, () -> {
+            envioService.asignarRepartidor(envioId, repartidor.getId());
         });
 
         verify(envioRepository, never()).save(any(Envio.class));

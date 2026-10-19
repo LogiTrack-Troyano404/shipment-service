@@ -14,10 +14,14 @@ public interface EnvioService {
 
     Envio buscarPorCodigoSeguimiento(String codigo);
 
+    List<Envio> listarEnvios();
+
     List<Envio> listarEnviosPorEstados(EstadoEnvio estado);
 
     Envio cancelarEnvio(UUID id);
 
     Envio actualizarEstado(UUID id, EstadoEnvio estado);
+
+    Envio asignarRepartidor(UUID envioId, UUID repartidorId);
 
 }

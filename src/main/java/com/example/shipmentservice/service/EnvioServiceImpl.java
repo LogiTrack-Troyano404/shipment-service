@@ -56,10 +56,11 @@ public class EnvioServiceImpl  implements  EnvioService{
                 .toUpperCase();
 
         envio.setCodigoSeguimiento(codigoSeguimiento);
+        envio.setEstado(EstadoEnvio.PENDIENTE);
         Envio saved = envioRepository.save(envio);
         registrarHistorial(saved, EstadoEnvio.PENDIENTE);
 
-        log.info("Envio registrado correctamente. Codigo de seguimiento: {} ");
+        log.info("Envio registrado correctamente. Codigo de seguimiento: {}", codigoSeguimiento);
         return saved;
     }
 
@@ -88,7 +89,14 @@ public class EnvioServiceImpl  implements  EnvioService{
     }
 
     @Override
-    @Transactional
+    @Transactional(readOnly = true)
+    public List<Envio> listarEnvios(){
+        log.info("Listando todos los envios registrados");
+        return envioRepository.findAll();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public List<Envio> listarEnviosPorEstados(EstadoEnvio estado){
         log.info("Listando envios filtrados por estado: {}", estado);
         return envioRepository.findByEstado(estado);
@@ -126,7 +134,35 @@ public class EnvioServiceImpl  implements  EnvioService{
         return actualizado;
     }
 
+    @Override
     @Transactional
+    public Envio asignarRepartidor(UUID envioId, UUID repartidorId) {
+        log.info("Solicitud de asignación del repartidor ID: {} al envío ID: {}", repartidorId, envioId);
+
+        Envio envio = buscarPorId(envioId);
+
+        if (envio.getEstado() != EstadoEnvio.PENDIENTE) {
+            log.warn("No se puede asignar repartidor al envío ID: {} porque su estado es {}", envioId, envio.getEstado());
+            throw new AsignacionDeRepartidor("El repartidor solo puede asignarse mientras el envío está PENDIENTE");
+        }
+
+        Repartidor repartidor = repartidorRepository.findById(repartidorId)
+                .orElseThrow(() -> {
+                    log.error("Error al asignar: Repartidor no encontrado con ID: {}", repartidorId);
+                    return new RepartidorNoEncontrado("Repartidor no encontrado con ID: " + repartidorId);
+                });
+
+        if (repartidor.getEstado() != EstadoRepartidor.ACTIVO) {
+            log.warn("Intento de asignar repartidor inactivo (ID: {} con estado: {})", repartidorId, repartidor.getEstado());
+            throw new AsignacionDeRepartidor("El repartidor debe estar ACTIVO para ser asignado");
+        }
+
+        envio.setRepartidor(repartidor);
+        Envio actualizado = envioRepository.save(envio);
+        log.info("Repartidor ID: {} asignado correctamente al envío ID: {}", repartidorId, envioId);
+        return actualizado;
+    }
+
     private void registrarHistorial(Envio envio, EstadoEnvio estadoAnterior) {
         log.debug("Registrando auditoría de cambio de estado para envío ID: {}", envio.getId());
         HistorialEstado historial = new HistorialEstado();
@@ -136,7 +172,6 @@ public class EnvioServiceImpl  implements  EnvioService{
         historialEstadoRepository.save(historial);
     }
 
-    @Transactional
     private Envio cambiarEstado(Envio envio, EstadoEnvio estadoNuevo){
         EstadoEnvio estadoAnterior = envio.getEstado();
         envio.setEstado(estadoNuevo);

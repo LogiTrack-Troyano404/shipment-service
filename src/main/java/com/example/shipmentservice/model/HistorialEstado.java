@@ -3,11 +3,14 @@ package com.example.shipmentservice.model;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
+
 import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
-@Table(name = "Hitorial_de_estados")
+@Table(name = "historial_de_estados")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -17,6 +20,8 @@ public class HistorialEstado extends AuditoriaBase{
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.UUID)
+	@JdbcTypeCode(SqlTypes.CHAR)
+	@Column(length = 36)
 	@EqualsAndHashCode.Include
 	private UUID id;
 	

@@ -5,8 +5,10 @@ services:
     container_name: shipment-mysql-db
     restart: always
     environment:
-      MYSQL_DATABASE: shipment-service
-      MYSQL_ROOT_PASSWORD: 1234
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-shipment_db}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root}
+      MYSQL_USER: ${MYSQL_USER:-admin_shipment}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-}
     ports:
       - "3306:3306"
     volumes:
@@ -28,9 +30,9 @@ services:
     ports:
       - "8080:8080"
     environment:
-      SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/shipment_db?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
-      SPRING_DATASOURCE_USERNAME: root
-      SPRING_DATASOURCE_PASSWORD: root
+      SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/${MYSQL_DATABASE:-shipment_db}?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+      SPRING_DATASOURCE_USERNAME: ${MYSQL_USER:-admin_shipment}
+      SPRING_DATASOURCE_PASSWORD: ${MYSQL_PASSWORD}
     depends_on:
       db:
         condition: service_healthy
