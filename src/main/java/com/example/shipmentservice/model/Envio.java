@@ -3,6 +3,9 @@ package com.example.shipmentservice.model;
 import java.util.*;
 import java.util.UUID;
 
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
+
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -18,6 +21,8 @@ public class Envio extends AuditoriaBase{
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.UUID)
+	@JdbcTypeCode(SqlTypes.CHAR)
+	@Column(length = 36)
 	@EqualsAndHashCode.Include
 	private UUID id;
 	
@@ -25,20 +30,20 @@ public class Envio extends AuditoriaBase{
 	@EqualsAndHashCode.Include
 	private String codigoSeguimiento;
 	
-	@Column(nullable = false, precision = 15, scale = 2)
+	@Column(nullable = false)
 	private double peso;
 	
-	@Column(nullable = false, precision = 15, scale = 2)
+	@Column(nullable = false)
 	private double ancho;
 	
-	@Column(nullable = false, precision = 15, scale = 2)
+	@Column(nullable = false)
 	private double alto;
 	
 	@Enumerated(EnumType.STRING)
 	@Column(nullable = false, length = 20)
 	private EstadoEnvio estado;
 	
-	@Column(nullable = false, precision = 15, scale = 2)
+	@Column(nullable = false)
 	private Double tarifa;
 	
 	@Embedded

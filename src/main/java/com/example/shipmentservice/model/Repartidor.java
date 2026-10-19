@@ -2,6 +2,9 @@ package com.example.shipmentservice.model;
 
 import java.util.*;
 
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
+
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -16,6 +19,8 @@ public class Repartidor extends AuditoriaBase{
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.UUID)
+	@JdbcTypeCode(SqlTypes.CHAR)
+	@Column(length = 36)
 	@EqualsAndHashCode.Include
 	private UUID id;
 	
