@@ -1,7 +1,8 @@
-package com.example.shipmentservice.service;
+package com.example.shipmentservice.service.impl;
 
 import com.example.shipmentservice.Exception.*;
 import com.example.shipmentservice.model.*;
+import com.example.shipmentservice.service.EnvioService;
 import com.example.shipmentservice.repository.ClienteRepository;
 import com.example.shipmentservice.repository.EnvioRepository;
 import com.example.shipmentservice.repository.HistorialEstadoRepository;

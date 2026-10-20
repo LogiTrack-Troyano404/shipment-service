@@ -1,5 +1,7 @@
 package com.example.shipmentservice.service;
 
+import com.example.shipmentservice.service.impl.EnvioServiceImpl;
+
 import com.example.shipmentservice.Exception.AsignacionDeRepartidor;
 import com.example.shipmentservice.Exception.CancelacionDeEnvio;
 import com.example.shipmentservice.Exception.RepartidorNoEncontrado;
