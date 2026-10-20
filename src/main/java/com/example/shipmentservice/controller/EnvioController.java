@@ -21,18 +21,22 @@ import com.example.shipmentservice.model.Envio;
 import com.example.shipmentservice.model.EstadoEnvio;
 import com.example.shipmentservice.service.EnvioService;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("/api/v1/envios")
 @RequiredArgsConstructor
+@Tag(name = "Envíos", description = "Gestión del ciclo de vida de envíos")
 public class EnvioController {
 
     private final EnvioService envioService;
     private final EnvioMapper envioMapper;
 
     @PostMapping
+    @Operation(summary = "Registrar un nuevo envío")
     public ResponseEntity<EnvioResponseDTO> registrarEnvio(@Valid @RequestBody EnvioRequestDTO request) {
         Envio envio = envioMapper.toEntity(request);
         Envio guardado = envioService.registrarEnvio(envio, request.clienteId(), request.repartidorId());
@@ -40,16 +44,19 @@ public class EnvioController {
     }
 
     @GetMapping("/{id}")
+    @Operation(summary = "Consultar un envío por su ID")
     public EnvioResponseDTO buscarPorId(@PathVariable UUID id) {
         return envioMapper.toResponse(envioService.buscarPorId(id));
     }
 
     @GetMapping("/tracking/{codigo}")
+    @Operation(summary = "Consultar un envío por su código de seguimiento")
     public EnvioResponseDTO buscarPorCodigoSeguimiento(@PathVariable String codigo) {
         return envioMapper.toResponse(envioService.buscarPorCodigoSeguimiento(codigo));
     }
 
     @GetMapping
+    @Operation(summary = "Listar envíos, opcionalmente filtrados por estado")
     public List<EnvioResponseDTO> listarEnvios(@RequestParam(required = false) EstadoEnvio estado) {
         List<Envio> envios = estado != null
                 ? envioService.listarEnviosPorEstados(estado)
@@ -58,11 +65,13 @@ public class EnvioController {
     }
 
     @PostMapping("/{id}/cancelar")
+    @Operation(summary = "Cancelar un envío (solo si está PENDIENTE)")
     public EnvioResponseDTO cancelarEnvio(@PathVariable UUID id) {
         return envioMapper.toResponse(envioService.cancelarEnvio(id));
     }
 
     @PostMapping("/{id}/asignar-repartidor")
+    @Operation(summary = "Asignar un repartidor activo a un envío PENDIENTE")
     public EnvioResponseDTO asignarRepartidor(@PathVariable UUID id,
                                               @Valid @RequestBody AsignarRepartidorRequestDTO request) {
         return envioMapper.toResponse(envioService.asignarRepartidor(id, request.repartidorId()));
