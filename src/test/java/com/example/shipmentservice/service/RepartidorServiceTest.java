@@ -1,5 +1,7 @@
 package com.example.shipmentservice.service;
 
+import com.example.shipmentservice.service.impl.RepartidorServiceImpl;
+
 import com.example.shipmentservice.Exception.RepartidorNoEncontrado;
 import com.example.shipmentservice.model.EstadoRepartidor;
 import com.example.shipmentservice.model.Repartidor;

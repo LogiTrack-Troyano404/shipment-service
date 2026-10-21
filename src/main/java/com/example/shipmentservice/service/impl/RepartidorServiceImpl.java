@@ -1,9 +1,10 @@
-package com.example.shipmentservice.service;
+package com.example.shipmentservice.service.impl;
 
 import com.example.shipmentservice.Exception.RepartidorNoEncontrado;
 import com.example.shipmentservice.model.EstadoRepartidor;
 import com.example.shipmentservice.model.Repartidor;
 import com.example.shipmentservice.repository.RepartidorRepository;
+import com.example.shipmentservice.service.RepartidorService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
