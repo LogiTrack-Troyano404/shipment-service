@@ -14,16 +14,6 @@ CREATE TABLE IF NOT EXISTS clientes (
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4;
 
-CREATE TABLE IF NOT EXISTS repartidores (
-    id                 varchar(36)  NOT NULL,
-    fecha_creacion     datetime(6)  NOT NULL,
-    fecha_modificacion datetime(6)  DEFAULT NULL,
-    estado             enum('ACTIVO','INACTIVO') NOT NULL,
-    nombre_repartidor  varchar(150) NOT NULL,
-    tipo_de_vehiculo   varchar(200) NOT NULL,
-    PRIMARY KEY (id)
-) ENGINE = InnoDB
-  DEFAULT CHARSET = utf8mb4;
 
 CREATE TABLE IF NOT EXISTS envios (
     id                    varchar(36)  NOT NULL,
@@ -47,10 +37,8 @@ CREATE TABLE IF NOT EXISTS envios (
     repartidor_id         varchar(36)  DEFAULT NULL,
     PRIMARY KEY (id),
     UNIQUE KEY uk_envios_codigo_seguimiento (codigo_de_seguimiento),
-    KEY fk_envios_repartidor (repartidor_id),
     KEY fk_envios_cliente (cliente_id),
     CONSTRAINT fk_envios_cliente FOREIGN KEY (cliente_id) REFERENCES clientes (id),
-    CONSTRAINT fk_envios_repartidor FOREIGN KEY (repartidor_id) REFERENCES repartidores (id)
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4;
 
