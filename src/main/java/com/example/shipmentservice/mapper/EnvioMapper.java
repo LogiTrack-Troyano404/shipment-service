@@ -19,6 +19,7 @@ public class EnvioMapper {
         envio.setAncho(dto.ancho());
         envio.setAlto(dto.alto());
         envio.setTarifa(dto.tarifa());
+        envio.setRepartidorId(dto.repartidorId());
         return envio;
     }
 
@@ -35,8 +36,8 @@ public class EnvioMapper {
                 toDTO(envio.getDestino()),
                 envio.getCliente() != null ? envio.getCliente().getId() : null,
                 envio.getCliente() != null ? envio.getCliente().getNombre() : null,
-                envio.getRepartidor() != null ? envio.getRepartidor().getId() : null,
-                envio.getRepartidor() != null ? envio.getRepartidor().getNombre() : null,
+                envio.getRepartidorId(),
+                null,
                 envio.getFechaCracion(),
                 envio.getFechaModificacion());
     }

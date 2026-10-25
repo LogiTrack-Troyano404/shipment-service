@@ -6,7 +6,6 @@ import com.example.shipmentservice.service.EnvioService;
 import com.example.shipmentservice.repository.ClienteRepository;
 import com.example.shipmentservice.repository.EnvioRepository;
 import com.example.shipmentservice.repository.HistorialEstadoRepository;
-import com.example.shipmentservice.repository.RepartidorRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -23,7 +22,6 @@ public class EnvioServiceImpl  implements  EnvioService{
 
     private final EnvioRepository envioRepository;
     private final ClienteRepository clienteRepository;
-    private final RepartidorRepository repartidorRepository;
     private final HistorialEstadoRepository historialEstadoRepository;
 
     @Override
@@ -39,17 +37,9 @@ public class EnvioServiceImpl  implements  EnvioService{
         envio.setCliente(cliente);
 
         if(repartidorId != null){
-            log.info("Asignando repartidor con ID: {} al envío", repartidorId);
+            log.info("Validacion y asignacion de repartidor ID: {} para el envio", repartidorId);
 
-            Repartidor repartidor = repartidorRepository.findById(repartidorId)
-                    .orElseThrow(() -> new RepartidorNoEncontrado("Repartidor no encontrado"));
-                    log.error("Error al registrar: Repartidor no encontrado con ID: {}", repartidorId);
-
-            if(repartidor.getEstado() != EstadoRepartidor.ACTIVO){
-                log.warn("Intento de asignar repartidor inactivo (ID: {} con estado: {})", repartidorId, repartidor.getEstado());
-                throw new IllegalStateException("El repatidor debe estar ACTIVO");
-            }
-            envio.setRepartidor(repartidor);
+            envio.setRepartidorId(repartidorId);
         }
         String codigoSeguimiento = new StringBuilder("ENV-")
                 .append(UUID.randomUUID().toString(), 0, 8)
@@ -68,7 +58,6 @@ public class EnvioServiceImpl  implements  EnvioService{
     @Override
     @Transactional(readOnly = true)
     public Envio buscarPorId(UUID id){
-
         log.info("Buscando envio por ID: {}", id);
         return envioRepository.findById(id)
              .orElseThrow(() -> {
@@ -80,7 +69,6 @@ public class EnvioServiceImpl  implements  EnvioService{
     @Override
     @Transactional
     public Envio buscarPorCodigoSeguimiento(String codigo){
-
         log.info("Buscando envio por su codigo de seguimiento: {} ", codigo);
         return envioRepository.findByCodigoSeguimiento(codigo)
                 .orElseThrow(() -> {
@@ -147,18 +135,7 @@ public class EnvioServiceImpl  implements  EnvioService{
             throw new AsignacionDeRepartidor("El repartidor solo puede asignarse mientras el envío está PENDIENTE");
         }
 
-        Repartidor repartidor = repartidorRepository.findById(repartidorId)
-                .orElseThrow(() -> {
-                    log.error("Error al asignar: Repartidor no encontrado con ID: {}", repartidorId);
-                    return new RepartidorNoEncontrado("Repartidor no encontrado con ID: " + repartidorId);
-                });
-
-        if (repartidor.getEstado() != EstadoRepartidor.ACTIVO) {
-            log.warn("Intento de asignar repartidor inactivo (ID: {} con estado: {})", repartidorId, repartidor.getEstado());
-            throw new AsignacionDeRepartidor("El repartidor debe estar ACTIVO para ser asignado");
-        }
-
-        envio.setRepartidor(repartidor);
+        envio.setRepartidorId(repartidorId);
         Envio actualizado = envioRepository.save(envio);
         log.info("Repartidor ID: {} asignado correctamente al envío ID: {}", repartidorId, envioId);
         return actualizado;

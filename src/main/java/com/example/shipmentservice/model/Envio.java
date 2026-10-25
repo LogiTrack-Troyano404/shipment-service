@@ -63,10 +63,10 @@ public class Envio extends AuditoriaBase{
 		@AttributeOverride(name = "codigoPostal", column = @Column(name = "destino_codigo_postal", nullable = false, length = 15))
 	})
 	private Direccion destino;
-	
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "repartidor_id")
-	private Repartidor repartidor;
+
+	@Column(name = "repartidor_id")
+	@JdbcTypeCode(SqlTypes.CHAR)
+	private UUID repartidorId;
 	
 	@ManyToOne(fetch = FetchType.LAZY, optional = false)
 	@JoinColumn(name = "cliente_id", nullable = false)
