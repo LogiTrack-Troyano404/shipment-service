@@ -1,6 +1,7 @@
 package com.example.shipmentservice.service.impl;
 
 import com.example.shipmentservice.Exception.*;
+import com.example.shipmentservice.client.CourierClient;
 import com.example.shipmentservice.model.*;
 import com.example.shipmentservice.service.EnvioService;
 import com.example.shipmentservice.repository.ClienteRepository;
@@ -23,6 +24,7 @@ public class EnvioServiceImpl  implements  EnvioService{
     private final EnvioRepository envioRepository;
     private final ClienteRepository clienteRepository;
     private final HistorialEstadoRepository historialEstadoRepository;
+    private final CourierClient courierClient;
 
     @Override
     @Transactional
@@ -38,7 +40,11 @@ public class EnvioServiceImpl  implements  EnvioService{
 
         if(repartidorId != null){
             log.info("Validacion y asignacion de repartidor ID: {} para el envio", repartidorId);
+            var courierDto = courierClient.obtenerRepartidorPorId(repartidorId);
 
+            if (!"ACTIVO".equalsIgnoreCase(courierDto.estado())) {
+                throw new AsignacionDeRepartidor("El repartidor debe estar ACTIVO para ser asignado");
+            }
             envio.setRepartidorId(repartidorId);
         }
         String codigoSeguimiento = new StringBuilder("ENV-")
@@ -134,7 +140,12 @@ public class EnvioServiceImpl  implements  EnvioService{
             log.warn("No se puede asignar repartidor al envío ID: {} porque su estado es {}", envioId, envio.getEstado());
             throw new AsignacionDeRepartidor("El repartidor solo puede asignarse mientras el envío está PENDIENTE");
         }
-
+        if(repartidorId != null){
+            var courierDto = courierClient.obtenerRepartidorPorId(repartidorId);
+            if (!"ACTIVO".equalsIgnoreCase(courierDto.estado())) {
+                throw new AsignacionDeRepartidor("El repartidor debe estar ACTIVO para ser asignado");
+            }
+        }
         envio.setRepartidorId(repartidorId);
         Envio actualizado = envioRepository.save(envio);
         log.info("Repartidor ID: {} asignado correctamente al envío ID: {}", repartidorId, envioId);
