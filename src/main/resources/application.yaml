@@ -36,3 +36,8 @@ springdoc:
     path: /v3/api-docs
   swagger-ui:
     path: /swagger-ui.html
+
+#para courier service
+services:
+  courier:
+    url: http://localhost:8081
