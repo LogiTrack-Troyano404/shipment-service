@@ -2,13 +2,11 @@
 FROM eclipse-temurin:25-jdk-alpine AS builder
 WORKDIR /app
 
-# Copiar archivos de configuración de Maven / Gradle
+# Copiar archivos de configuración de Maven
 COPY .mvn/ .mvn
 COPY mvnw pom.xml ./
 RUN chmod +x mvnw
 
-# Descargar dependencias en caché
-RUN ./mvnw dependency:go-offline
 
 # Copiar código fuente y compilar omitiendo los tests para acelerar el build
 COPY src ./src
@@ -21,6 +19,7 @@ WORKDIR /app
 # Copiar el JAR generado desde la etapa de compilación
 COPY --from=builder /app/target/*.jar app.jar
 
-EXPOSE 8080
+# Exponemos el puerto oficial del shipment-service en el Sprint 2
+EXPOSE 8082
 
 ENTRYPOINT ["java", "-jar", "app.jar"]
