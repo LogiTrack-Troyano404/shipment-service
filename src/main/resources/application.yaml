@@ -1,5 +1,5 @@
 server:
-  port: 8080
+  port: 8082
 
 spring:
   application:
@@ -41,3 +41,6 @@ springdoc:
 services:
   courier:
     url: http://localhost:8020
+
+jwt:
+  secret: "${JWT_SECRET:LogiTrackSprintDosClaveSecretaSuperSeguraParaValidarTokensDeFormaLocalEnElMicroservicioDeEnvios2026XYZ}"
