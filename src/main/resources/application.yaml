@@ -33,14 +33,19 @@ spring:
 
 springdoc:
   api-docs:
+    enabled: true
     path: /v3/api-docs
   swagger-ui:
+    enabled: true
     path: /swagger-ui.html
+    tags-sorter: alpha
+    operations-sorter: alpha
 
 #para courier service
 services:
   courier:
     url: http://localhost:8020
+
 
 jwt:
   secret: "${JWT_SECRET:LogiTrackSprintDosClaveSecretaSuperSeguraParaValidarTokensDeFormaLocalEnElMicroservicioDeEnvios2026XYZ}"
