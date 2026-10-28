@@ -7,7 +7,9 @@ spring:
 
   # Carga credenciales desde .env en la raíz del proyecto (opcional; no commiteado)
   config:
-    import: optional:file:.env[.properties]
+    import:
+      - "optional:file:.env[.properties]"
+      - "optional:configserver:"
 
   datasource:
     # 'db' es el nombre del servicio del contenedor de MySQL en docker-compose

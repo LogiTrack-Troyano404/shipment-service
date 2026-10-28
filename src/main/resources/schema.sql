@@ -38,7 +38,7 @@ CREATE TABLE IF NOT EXISTS envios (
     PRIMARY KEY (id),
     UNIQUE KEY uk_envios_codigo_seguimiento (codigo_de_seguimiento),
     KEY fk_envios_cliente (cliente_id),
-    CONSTRAINT fk_envios_cliente FOREIGN KEY (cliente_id) REFERENCES clientes (id),
+    CONSTRAINT fk_envios_cliente FOREIGN KEY (cliente_id) REFERENCES clientes (id)
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4;
 
