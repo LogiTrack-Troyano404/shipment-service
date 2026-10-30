@@ -20,7 +20,6 @@ import javax.crypto.SecretKey;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Component
 @Slf4j
@@ -49,12 +48,18 @@ public class JwtTokenValidatorFilter extends OncePerRequestFilter {
 
                 String username = claims.getSubject();
 
-                @SuppressWarnings("unchecked")
-                List<String> roles = claims.get("roles", List.class);
+                // 1. Extraemos el rol en singular tal como lo emite el security-service
+                String rol = claims.get("rol", String.class);
 
-                List<SimpleGrantedAuthority> authorities = roles.stream()
-                        .map(SimpleGrantedAuthority::new)
-                        .collect(Collectors.toList());
+                List<SimpleGrantedAuthority> authorities = List.of();
+                if (rol != null && !rol.isBlank()) {
+                    // 2. Aseguramos el prefijo ROLE_ requerido por Spring Security
+                    String formattedRole = rol.startsWith("ROLE_") ? rol : "ROLE_" + rol;
+                    authorities = List.of(new SimpleGrantedAuthority(formattedRole));
+                    log.info("Rol extraído y mapeado correctamente en shipment-service: {}", formattedRole);
+                } else {
+                    log.warn("No se encontró el claim 'rol' en el token para el usuario: {}", username);
+                }
 
                 UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
                         username, null, authorities

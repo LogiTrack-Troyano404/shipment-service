@@ -42,7 +42,7 @@ springdoc:
 #para courier service
 services:
   courier:
-    url: http://localhost:8020
+    url: http://courier-service-app:8020
 
 jwt:
   secret: "${JWT_SECRET:LogiTrackSprintDosClaveSecretaSuperSeguraParaValidarTokensDeFormaLocalEnElMicroservicioDeEnvios2026XYZ}"
