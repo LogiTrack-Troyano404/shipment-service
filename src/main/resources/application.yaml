@@ -4,10 +4,13 @@ server:
 spring:
   application:
     name: shipment-service
-
-  # Carga credenciales desde .env en la raíz del proyecto (opcional; no commiteado)
   config:
-    import: optional:file:.env[.properties]
+    import:
+      - optional:configserver:http://localhost:8085
+      - optional:file:.env[.properties]
+  cloud:
+    config:
+      enabled: true
 
   datasource:
     # 'db' es el nombre del servicio del contenedor de MySQL en docker-compose
@@ -41,11 +44,21 @@ springdoc:
     tags-sorter: alpha
     operations-sorter: alpha
 
-#para courier service
+# para courier service (manteniendo compatibilidad)
 services:
   courier:
     url: http://localhost:8020
 
-
 jwt:
   secret: "${JWT_SECRET:LogiTrackSprintDosClaveSecretaSuperSeguraParaValidarTokensDeFormaLocalEnElMicroservicioDeEnvios2026XYZ}"
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8065/eureka/
+  instance:
+    prefer-ip-address: true
+
+feign:
+  circuitbreaker:
+    enabled: true
