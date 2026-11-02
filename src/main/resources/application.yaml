@@ -1,3 +1,48 @@
+server:
+  port: 8082
+
 spring:
   application:
     name: shipment-service
+
+  # Carga credenciales desde .env en la raíz del proyecto (opcional; no commiteado)
+  config:
+    import:
+      - "optional:file:.env[.properties]"
+      - "optional:configserver:"
+
+  datasource:
+    # 'db' es el nombre del servicio del contenedor de MySQL en docker-compose
+    url: ${SPRING_DATASOURCE_URL:jdbc:mysql://localhost:3306/shipment_db?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC}
+    username: ${SPRING_DATASOURCE_USERNAME:admin_shipment}
+    password: ${SPRING_DATASOURCE_PASSWORD:}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    hibernate:
+      # 'none' o 'validate' si usas schema.sql/data.sql manualmente, o 'update' para que Hibernate gestione tablas
+      ddl-auto: update
+    # data.sql corre DESPUÉS de que Hibernate cree las tablas
+    defer-datasource-initialization: true
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+  sql:
+    init:
+      mode: never # Ejecuta schema.sql y data.sql al iniciar la aplicación
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+
+#para courier service
+services:
+  courier:
+    url: http://localhost:8020
+
+jwt:
+  secret: "${JWT_SECRET:LogiTrackSprintDosClaveSecretaSuperSeguraParaValidarTokensDeFormaLocalEnElMicroservicioDeEnvios2026XYZ}"

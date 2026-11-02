@@ -1,0 +1,50 @@
+services:
+  # Servicio de la Base de Datos MySQL
+  db:
+    image: mysql:8.0
+    container_name: shipment-mysql-db
+    restart: always
+    environment:
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-shipment_db}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root}
+      MYSQL_USER: ${MYSQL_USER:-admin_shipment}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-}
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - shipment-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 5s
+      retries: 10
+
+  # Servicio del Microservicio Spring Boot (Sprint 2)
+  shipment-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: shipment-service-app
+    restart: always
+    ports:
+      - "8082:8082"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/${MYSQL_DATABASE:-shipment_db}?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+      SPRING_DATASOURCE_USERNAME: ${MYSQL_USER:-admin_shipment}
+      SPRING_DATASOURCE_PASSWORD: ${MYSQL_PASSWORD}
+      SPRING_SQL_INIT_MODE: always
+      # Inyectamos la clave secreta para el filtro JWT local de seguridad
+      JWT_SECRET: ${JWT_SECRET}
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - shipment-network
+
+volumes:
+  mysql_data:
+
+networks:
+  shipment-network:
+    driver: bridge
