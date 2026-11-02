@@ -12,6 +12,7 @@ import io.swagger.v3.oas.models.security.SecurityScheme;
 @Configuration
 public class OpenApiConfig {
 
+
     private static final String SECURITY_SCHEME_NAME = "bearer-jwt";
 
     @Bean
@@ -30,5 +31,6 @@ public class OpenApiConfig {
                                         .scheme("bearer")
                                         .bearerFormat("JWT")
                                         .description("Pega aquí el token JWT obtenido en el login")));
+
     }
 }
