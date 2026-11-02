@@ -3,6 +3,7 @@ package com.example.shipmentservice.controller;
 import java.util.List;
 import java.util.UUID;
 
+import lombok.Data;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -32,6 +33,7 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequestMapping("/api/v1/clientes")
 @RequiredArgsConstructor
+@Data
 @Tag(name = "clientes", description = "Gestión de clientes")
 public class ClienteController {
 	
@@ -90,5 +92,3 @@ public class ClienteController {
     }
 }
 
-
-}
