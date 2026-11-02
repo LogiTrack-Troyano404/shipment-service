@@ -1,7 +1,7 @@
 package com.example.shipmentservice.service;
 
 import com.example.shipmentservice.service.impl.EnvioServiceImpl;
-import com.example.shipmentservice.client.CourierClient;
+import com.example.shipmentservice.client.CourierClient; // O CourierClient según tu naming actual
 import com.example.shipmentservice.dto.CourierResponseDTO;
 import com.example.shipmentservice.Exception.AsignacionDeRepartidor;
 import com.example.shipmentservice.Exception.CancelacionDeEnvio;
@@ -35,7 +35,7 @@ class EnvioServiceTest {
     @Mock
     private HistorialEstadoRepository historialEstadoRepository;
     @Mock
-    private CourierClient courierClient;
+    private CourierClient courierFeignClient; // Actualizado al cliente OpenFeign del Sprint 3
 
     @InjectMocks
     private EnvioServiceImpl envioService;
@@ -150,7 +150,7 @@ class EnvioServiceTest {
         CourierResponseDTO courierDto = new CourierResponseDTO(repartidorId, "Carlos Gómez", "Motocicleta", "ACTIVO");
 
         when(envioRepository.findById(envioId)).thenReturn(Optional.of(envio));
-        when(courierClient.obtenerRepartidorPorId(repartidorId)).thenReturn(courierDto);
+        when(courierFeignClient.obtenerRepartidorPorId(repartidorId)).thenReturn(courierDto);
         when(envioRepository.save(any(Envio.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         Envio resultado = envioService.asignarRepartidor(envioId, repartidorId);
@@ -158,7 +158,7 @@ class EnvioServiceTest {
         assertNotNull(resultado);
         assertEquals(repartidorId, resultado.getRepartidorId());
         verify(envioRepository, times(1)).save(envio);
-        verify(courierClient, times(1)).obtenerRepartidorPorId(repartidorId);
+        verify(courierFeignClient, times(1)).obtenerRepartidorPorId(repartidorId);
     }
 
     @Test
@@ -170,15 +170,14 @@ class EnvioServiceTest {
             envioService.asignarRepartidor(envioId, repartidorId);
         });
 
-        verify(courierClient, never()).obtenerRepartidorPorId(any(UUID.class));
+        verify(courierFeignClient, never()).obtenerRepartidorPorId(any(UUID.class));
         verify(envioRepository, never()).save(any(Envio.class));
     }
 
     @Test
     void asignarRepartidorFallaSiRepartidorNoExiste() {
         when(envioRepository.findById(envioId)).thenReturn(Optional.of(envio));
-        // Simulamos que el cliente HTTP lanza la excepción porque el courier-service devolvió 404
-        when(courierClient.obtenerRepartidorPorId(repartidorId))
+        when(courierFeignClient.obtenerRepartidorPorId(repartidorId))
                 .thenThrow(new RepartidorNoEncontrado("Repartidor no encontrado"));
 
         assertThrows(RepartidorNoEncontrado.class, () -> {
@@ -193,12 +192,30 @@ class EnvioServiceTest {
         CourierResponseDTO courierDto = new CourierResponseDTO(repartidorId, "Carlos Gómez", "Motocicleta", "INACTIVO");
 
         when(envioRepository.findById(envioId)).thenReturn(Optional.of(envio));
-        when(courierClient.obtenerRepartidorPorId(repartidorId)).thenReturn(courierDto);
+        when(courierFeignClient.obtenerRepartidorPorId(repartidorId)).thenReturn(courierDto);
 
         assertThrows(AsignacionDeRepartidor.class, () -> {
             envioService.asignarRepartidor(envioId, repartidorId);
         });
 
+        verify(envioRepository, never()).save(any(Envio.class));
+    }
+
+    // --- NUEVOS TESTS AGREGADOS PARA VALIDAR EL FALLBACK Y RESILIENCIA (Sprint 3) ---
+
+    @Test
+    void asignarRepartidorActivaFallbackCuandoServicioCourierEstaCaido() {
+        when(envioRepository.findById(envioId)).thenReturn(Optional.of(envio));
+
+        // Simulamos la caída de comunicación que intercepta el mecanismo de Fallback
+        when(courierFeignClient.obtenerRepartidorPorId(repartidorId))
+                .thenThrow(new RuntimeException("El servicio de repartidores no se encuentra disponible temporalmente"));
+
+        assertThrows(RuntimeException.class, () -> {
+            envioService.asignarRepartidor(envioId, repartidorId);
+        });
+
+        verify(courierFeignClient, times(1)).obtenerRepartidorPorId(repartidorId);
         verify(envioRepository, never()).save(any(Envio.class));
     }
 }

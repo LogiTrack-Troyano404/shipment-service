@@ -3,6 +3,7 @@ package com.example.shipmentservice.controller;
 import java.util.List;
 import java.util.UUID;
 
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -30,6 +31,7 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/api/v1/envios")
 @RequiredArgsConstructor
 @Tag(name = "Envíos", description = "Gestión del ciclo de vida de envíos")
+@SecurityRequirement(name = "bearer-jwt")
 public class EnvioController {
 
     private final EnvioService envioService;

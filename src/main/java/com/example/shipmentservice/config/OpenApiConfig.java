@@ -12,7 +12,8 @@ import io.swagger.v3.oas.models.security.SecurityScheme;
 @Configuration
 public class OpenApiConfig {
 
-    public static final String BEARER_JWT = "bearer-jwt";
+
+    private static final String SECURITY_SCHEME_NAME = "bearer-jwt";
 
     @Bean
     public OpenAPI shipmentOpenAPI() {
@@ -20,13 +21,16 @@ public class OpenApiConfig {
                 .info(new Info()
                         .title("Shipment Service API")
                         .version("v1")
-                        .description("Microservicio de gestión de envíos y repartidores — LogiTrack Sprint 1"))
-                .addSecurityItem(new SecurityRequirement().addList(BEARER_JWT))
-                .components(new Components().addSecuritySchemes(BEARER_JWT,
-                        new SecurityScheme()
-                                .type(SecurityScheme.Type.HTTP)
-                                .scheme("bearer")
-                                .bearerFormat("JWT")
-                                .description("Pegá el token devuelto por POST /auth/login de security-service (sin la palabra Bearer)")));
+                        .description("Microservicio de envíos - LogiTrack"))
+                .addSecurityItem(new SecurityRequirement().addList(SECURITY_SCHEME_NAME))
+                .components(new Components()
+                        .addSecuritySchemes(SECURITY_SCHEME_NAME,
+                                new SecurityScheme()
+                                        .name(SECURITY_SCHEME_NAME)
+                                        .type(SecurityScheme.Type.HTTP)
+                                        .scheme("bearer")
+                                        .bearerFormat("JWT")
+                                        .description("Pega aquí el token JWT obtenido en el login")));
+
     }
 }

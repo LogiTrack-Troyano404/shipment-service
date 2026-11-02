@@ -52,7 +52,7 @@ public class ClienteServiceImpl implements ClienteService{
 	@Transactional
 	public Cliente actualizarCliente(UUID id, ClienteRequestDTO dato) {
 		// TODO Auto-generated method stub
-		log.info("Actualizar cliente con ID: {}", id)
+		log.info("Actualizar cliente con ID: {}", id);
 		
 		Cliente cliente = buscarPorId(id);
 		cliente.setNombre(dato.nombre());
