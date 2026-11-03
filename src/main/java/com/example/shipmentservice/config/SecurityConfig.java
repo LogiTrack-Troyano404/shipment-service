@@ -24,11 +24,12 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
+                        // Rutas públicas (Swagger, documentación y envíos temporalmente para la grabación)
                         .requestMatchers(
+                                "/v3/api-docs/**",
                                 "/swagger-ui/**",
                                 "/swagger-ui.html",
-                                "/v3/api-docs/**",
-                                "/swagger-resources/**"
+                                "/api/v1/envios/**"
                         ).permitAll()
 
                         // Reglas de negocio y control de acceso por roles
