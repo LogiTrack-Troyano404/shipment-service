@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 
 import java.util.UUID;
 
-// Añadimos el atributo fallback con la clase que acabamos de crear
+
 @FeignClient(name = "courier-service", path = "/api/v1/repartidores", fallback = CourierFeignClientFallback.class)
 public interface CourierFeignClient {
 

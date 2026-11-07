@@ -2,14 +2,22 @@ package com.example.shipmentservice.mapper;
 
 import org.springframework.stereotype.Component;
 
+import com.example.shipmentservice.client.CourierClient;
 import com.example.shipmentservice.dto.DireccionDTO;
 import com.example.shipmentservice.dto.EnvioRequestDTO;
 import com.example.shipmentservice.dto.EnvioResponseDTO;
 import com.example.shipmentservice.model.Direccion;
 import com.example.shipmentservice.model.Envio;
 
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
 @Component
+@RequiredArgsConstructor
+@Slf4j
 public class EnvioMapper {
+
+    private final CourierClient courierClient;
 
     public Envio toEntity(EnvioRequestDTO dto) {
         Envio envio = new Envio();
@@ -24,6 +32,22 @@ public class EnvioMapper {
     }
 
     public EnvioResponseDTO toResponse(Envio envio) {
+        String repartidorNombre = null;
+
+        // Si el envío tiene un repartidor asignado, consultamos su nombre mediante el Client
+        if (envio.getRepartidorId() != null) {
+            try {
+                var courierDto = courierClient.obtenerRepartidorPorId(envio.getRepartidorId());
+                if (courierDto != null) {
+                    repartidorNombre = courierDto.nombre();
+                }
+            } catch (Exception e) {
+                log.warn("No se pudo obtener el nombre del repartidor con ID: {}. Error: {}",
+                        envio.getRepartidorId(), e.getMessage());
+                repartidorNombre = "Repartidor (ID desincronizado)";
+            }
+        }
+
         return new EnvioResponseDTO(
                 envio.getId(),
                 envio.getCodigoSeguimiento(),
@@ -37,7 +61,7 @@ public class EnvioMapper {
                 envio.getCliente() != null ? envio.getCliente().getId() : null,
                 envio.getCliente() != null ? envio.getCliente().getNombre() : null,
                 envio.getRepartidorId(),
-                null,
+                repartidorNombre, // <- Aquí ya va el nombre obtenido dinámicamente
                 envio.getFechaCracion(),
                 envio.getFechaModificacion());
     }

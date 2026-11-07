@@ -135,7 +135,6 @@ public class EnvioServiceImpl  implements  EnvioService{
         log.info("Solicitud de asignación del repartidor ID: {} al envío ID: {}", repartidorId, envioId);
 
         Envio envio = buscarPorId(envioId);
-
         if (envio.getEstado() != EstadoEnvio.PENDIENTE) {
             log.warn("No se puede asignar repartidor al envío ID: {} porque su estado es {}", envioId, envio.getEstado());
             throw new AsignacionDeRepartidor("El repartidor solo puede asignarse mientras el envío está PENDIENTE");
@@ -147,8 +146,9 @@ public class EnvioServiceImpl  implements  EnvioService{
             }
         }
         envio.setRepartidorId(repartidorId);
-        Envio actualizado = envioRepository.save(envio);
-        log.info("Repartidor ID: {} asignado correctamente al envío ID: {}", repartidorId, envioId);
+        Envio actualizado = cambiarEstado(envio, EstadoEnvio.EN_RUTA);
+
+        log.info("Repartidor ID: {} asignado y envío ID: {} actualizado a EN_RUTA exitosamente", repartidorId, envioId);
         return actualizado;
     }
 
