@@ -15,16 +15,17 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
+import com.example.shipmentservice.client.CourierFeignClient; // Importar Feign Client
 
 @RequiredArgsConstructor
 @Service
 @Slf4j
-public class EnvioServiceImpl  implements  EnvioService{
+public class EnvioServiceImpl implements EnvioService {
 
     private final EnvioRepository envioRepository;
     private final ClienteRepository clienteRepository;
     private final HistorialEstadoRepository historialEstadoRepository;
-    private final CourierClient courierClient;
+    private final CourierFeignClient courierFeignClient; // <- Usar el cliente Feign
 
     @Override
     @Transactional
@@ -40,13 +41,15 @@ public class EnvioServiceImpl  implements  EnvioService{
 
         if(repartidorId != null){
             log.info("Validacion y asignacion de repartidor ID: {} para el envio", repartidorId);
-            var courierDto = courierClient.obtenerRepartidorPorId(repartidorId);
+            var courierDto = courierFeignClient.obtenerRepartidorPorId(repartidorId); // <- Llamada Feign
 
             if (!"ACTIVO".equalsIgnoreCase(courierDto.estado())) {
                 throw new AsignacionDeRepartidor("El repartidor debe estar ACTIVO para ser asignado");
             }
             envio.setRepartidorId(repartidorId);
         }
+
+        // Resto del código de registro...
         String codigoSeguimiento = new StringBuilder("ENV-")
                 .append(UUID.randomUUID().toString(), 0, 8)
                 .toString()
@@ -140,7 +143,7 @@ public class EnvioServiceImpl  implements  EnvioService{
             throw new AsignacionDeRepartidor("El repartidor solo puede asignarse mientras el envío está PENDIENTE");
         }
         if(repartidorId != null){
-            var courierDto = courierClient.obtenerRepartidorPorId(repartidorId);
+            var courierDto = courierFeignClient.obtenerRepartidorPorId(repartidorId); // <- Llamada Feign
             if (!"ACTIVO".equalsIgnoreCase(courierDto.estado())) {
                 throw new AsignacionDeRepartidor("El repartidor debe estar ACTIVO para ser asignado");
             }
